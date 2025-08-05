@@ -41,8 +41,7 @@ spring:
       enabled: true
 
 jwt:
-  secret: yoBLl6KR5te3Pow3qsFG5T19TZFzPV2w/8s+2xhbfKACQT1hv+YdxV9l4QMdxExsa2hm0VBb17MEfW0QOVHttA==
-
+  secret: ${JWT_SECRET_KEY}
 
 
 
