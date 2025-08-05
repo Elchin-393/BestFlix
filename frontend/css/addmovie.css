@@ -1,0 +1,189 @@
+
+
+h6{
+  color: white;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+
+
+#add-movie-info h1{
+  margin: -520px 0px 0px 40px;
+}
+
+#add-movie-info h1::after{
+  content: "";
+  width: 1080px;
+  height: 1px;
+  background: white;
+  position: absolute;
+  margin: 50px 0px 0px -416px;
+}
+
+#infos{
+  display: flex;
+  justify-content: space-between;
+  
+}
+
+.input{
+  margin-bottom: 30px;
+}
+
+#info-1{
+  position: absolute;
+  inset: 200px 0px 0px 40px;
+}
+
+#info-1 input{
+  width: 350px;
+  height: 20px;
+  padding-left: 7px;
+}
+
+#info-2{
+  position: absolute;
+  inset: 200px 0px 0px 600px;
+}
+
+#info-2 input,
+.input-about{
+  
+  height: 20px;
+  padding-left: 7px;
+}
+
+#input-m,
+#input-p{
+  position: relative;
+}
+
+#input-m label,
+#input-p label{
+  width: 50px;
+  height: 26px;
+  background-color: #1b8b4d;
+  border: none;
+  border-radius: 4px;
+  margin-left: 400px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#input-m label{
+  position: absolute;
+  inset: 55px 0px 0px 370px;
+}
+
+#input-p label{
+  position: absolute;
+  inset: 132px 0px 0px 370px;
+}
+
+#info-2 .input-movie{
+  width: 140px;
+}
+
+#info-2 .input-picture{
+  width: 140px;
+}
+
+#selection{
+  width: 185px;
+  height:25px;
+  position: absolute;
+  inset: 22px 0px 0px 245px;
+}
+
+
+#info-2 .duration-cnt{
+  width: 182px;
+  position: absolute;
+  inset: 78px 0px 0px 246px;
+  height: 46px;
+}
+
+#info-2 .input-about{
+  width: 500px;
+  height: 101px;
+  padding-bottom: 70px;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  resize: none;
+  padding-top: 5px;
+}
+
+
+.upload-btn{
+  position: absolute;
+  width: 90px;
+  height: 30px;
+  bottom: 80px;
+  right: 253px;
+  background-color: #1b8b4d;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+
+#add-movie-info button:hover{
+  background-color: #36ac6b;
+}
+#add-movie-info label:hover{
+  background-color: #36ac6b;
+}
+#add-movie-info input:focus,
+.input-about{
+  outline: none;
+}
+
+.input-about::-webkit-scrollbar {
+  width: 8px; /* Width of the scrollbar */
+}
+
+.input-about::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+  border-radius: 5px; /* Rounded corners */
+}
+
+.input-about::-webkit-scrollbar-thumb {
+  background: #888; /* Scrollbar color */
+  border-radius: 5px;
+}
+
+.input-about::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker color when hovered */
+}
+
+
+
+@media (max-width: 768px) {
+  body {
+    min-width: 100%;
+  }
+
+  #infos {
+    flex-direction: column;
+    gap: 20px;
+    margin: 0 20px 30px;
+  }
+
+  #add-movie-info h1 {
+    font-size: 22px;
+    margin: 20px;
+  }
+
+  .upload-btn {
+    margin: 20px auto;
+    display: block;
+  }
+}
