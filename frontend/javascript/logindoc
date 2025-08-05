@@ -1,0 +1,54 @@
+File: login.js
+Handles:
+- Navigation to registration & password reset pages
+- Input validation
+- JWT-based authentication via /login endpoint
+- User feedback and redirection
+
+Summary Flow: 
+User Loads Page → Click Login → Validate Inputs → POST to /login → Handle Response → Show Alert → Redirect
+
+Input Validation Rules
+- Username must be ≥ 3 characters
+- Password must be ≥ 6 characters
+- Alerts shown using Swal.fire() on failure
+Validation happens before any network calls.
+
+- Friendly alerts for every state (missing input, invalid credentials, success)
+- Redirects to:
+- register.html for account creation
+- forgot-password.html for recovery
+- mymovies.html on successful login
+
+
+
+---
+
+## DOM Element Bindings
+
+| Selector             | Role                               |
+|----------------------|------------------------------------|
+| `#register a`        | Navigate to registration           |
+| `#remember a`        | Navigate to password recovery      |
+| `.log-btn`           | Trigger login process              |
+| `.input-u`, `.input-p` | Username and password fields      |
+
+---
+
+## Validation Rules
+
+- **Username**: Must be at least 3 characters  
+- **Password**: Must be at least 6 characters  
+- Alerts shown via `Swal.fire()` if fields are invalid
+
+---
+
+## Backend API Integration
+
+- **Endpoint**: `POST http://localhost:8080/login`
+- **Request Body**:
+  ```json
+  {
+    "username": "user",
+    "password": "secret"
+  }
