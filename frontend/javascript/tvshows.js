@@ -14,9 +14,12 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
 
+    const apiUrl = "http://localhost:8080";
+
+
   try {
     /** @type {Response} */
-    const response = await fetch("http://localhost:8080/rest/api/movie/all");
+    const response = await fetch(`${apiUrl}/rest/api/movie/all`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -50,7 +53,7 @@
         if(movie.category == "TV Show") {
         movieDiv.innerHTML = `
           <a href="movies.html?id=${movie.id}">
-            <img class="poster" src="http://localhost:8080/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
+            <img class="poster" src="${apiUrl}/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
             <h5>${movie.movieName}</h5>
             <h5>${new Date(movie.releaseDate).getFullYear()} 
               <span><img src="/images/icons/dot.png" alt=""></span> 

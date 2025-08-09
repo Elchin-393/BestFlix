@@ -1,3 +1,5 @@
+const apiUrl = "http://localhost:8080";
+
 /**
  * My Movies Page
  * Fetches user's movie collection using JWT and enables pagination, display, and logout logic.
@@ -20,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     /** @type {Response} */
-    const response = await fetch("http://localhost:8080/rest/api/movie/mymovies", {
+    const response = await fetch(`${apiUrl}/rest/api/movie/mymovies`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username })
@@ -57,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         movieDiv.dataset.id = movie.id;
         movieDiv.innerHTML = `
           <a href="movies.html?id=${movie.id}">
-            <img class="poster" src="http://localhost:8080/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
+            <img class="poster" src="${apiUrl}/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
             <h5 class="movie-name">${movie.movieName}</h5>
             <h5>${new Date(movie.releaseDate).getFullYear()}
               <span><img src="/images/icons/dot.png" alt=""></span>

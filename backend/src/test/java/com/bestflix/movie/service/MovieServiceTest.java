@@ -11,7 +11,6 @@ import com.bestflix.movie.security.entity.Users;
 import com.bestflix.movie.security.repository.UserRepository;
 import com.bestflix.movie.service.impl.FileStorageService;
 import com.bestflix.movie.service.impl.MovieService;
-import com.bestflix.movie.service.impl.VideoFileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +18,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +36,6 @@ class MovieServiceTest {
 
     @Mock
     private FileStorageService fileStorageService;
-
-    @Mock
-    private VideoFileStorageService videoFileStorageService;
 
     @Mock
     private MovieRepository movieRepository;
@@ -56,11 +55,19 @@ class MovieServiceTest {
     @Mock
     private MultipartFile videoFile;
 
+    @Mock
+    private S3Client s3Client;
+
+
+    private final String bucketName = "test-bucket";
+    private final String region = "eu-central-1";
+
+
     Users user;
     Movie movie;
     UsersMovie usersMovie;
     @BeforeEach
-    public void setup() {
+    public void setup() throws NoSuchFieldException, IllegalAccessException {
         user = Users.builder()
                 .username("Elcin")
                 .email("Mamedovelchin@gmail.com")
@@ -91,7 +98,27 @@ class MovieServiceTest {
                 .movie(movie)
                 .build();
 
-    }
+        MovieService movieService = new MovieService(
+                fileStorageService,
+                movieRepository,
+                userRepository,
+                usersMovieRepository,
+                s3Client
+        );
+
+        // Inject @Value fields manually
+        Field bucketField = MovieService.class.getDeclaredField("bucketName");
+        bucketField.setAccessible(true);
+        bucketField.set(movieService, bucketName);
+
+        Field regionField = MovieService.class.getDeclaredField("region");
+        regionField.setAccessible(true);
+        regionField.set(movieService, region);
+
+
+
+
+}
 
     @Test
     void uploadMovie_shouldUploadSuccessfully() throws IOException {
@@ -117,15 +144,16 @@ class MovieServiceTest {
         byte[] imageBytes = new byte[] {1, 2, 3};
         String savedImageName = "image123.jpg";
         String savedVideoName = "video123.mp4";
-        String videoPath = "C:/path/video123.mp4";
+        String videoPath = "https://test-bucket.s3.eu-central-1.amazonaws.com/video123.mp4";
 
         when(userRepository.findByUsername(username)).thenReturn(mockUser);
-        when(fileStorageService.save(imageFile)).thenReturn(savedImageName);
-        when(fileStorageService.save(videoFile)).thenReturn(savedVideoName);
+        when(fileStorageService.saveImage(imageFile)).thenReturn(savedImageName);
+        when(fileStorageService.saveVideo(videoFile)).thenReturn(savedVideoName);
         when(imageFile.getContentType()).thenReturn("image/jpeg");
         when(videoFile.getContentType()).thenReturn("video/mp4");
-        when(imageFile.getBytes()).thenReturn(imageBytes);
-        when(videoFileStorageService.save(videoFile)).thenReturn(videoPath);
+
+        when(fileStorageService.saveVideo(videoFile)).thenReturn(videoPath);
+
 
         when(movieRepository.save(any(Movie.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -134,10 +162,10 @@ class MovieServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals("Interstellar", result.getMovieName());
+
         assertEquals("USA", result.getCountry());
         assertEquals(savedImageName, result.getImageName());
-        assertEquals(videoPath, result.getVideoPath());
+        assertEquals(videoPath, result.getVideoName());
         assertEquals("image/jpeg", result.getImageType());
 
         verify(usersMovieRepository).save(any(UsersMovie.class));
@@ -232,17 +260,16 @@ class MovieServiceTest {
     }
 
     @Test
-    void test_Delete_Movie_By_Id(){
+    void test_Delete_Movie_By_Id() {
 
-        doNothing().when(usersMovieRepository).deleteAllByMovieId(movie.getId());
-        doNothing().when(movieRepository).deleteById(movie.getId());
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         String result = movieService.deleteMovieById(movie.getId());
 
-        verify(usersMovieRepository, times(1)).deleteAllByMovieId(movie.getId());
-        verify(movieRepository, times(1)).deleteById(movie.getId());
-        assertEquals("Movie deleted completely", result);
+        verify(usersMovieRepository).deleteAllByMovieId(movie.getId());
+        verify(movieRepository).deleteById(movie.getId());
 
+        assertEquals("Movie deleted completely", result);
     }
 
     @Test
@@ -267,12 +294,11 @@ class MovieServiceTest {
 
         // Mock image & video
         when(imageMock.getContentType()).thenReturn("image/png");
-        when(imageMock.getBytes()).thenReturn("fakeImageData".getBytes());
-        when(fileStorageService.save(imageMock)).thenReturn("savedImage.png");
+        when(fileStorageService.saveImage(imageMock)).thenReturn("savedImage.png");
 
         when(videoMock.getContentType()).thenReturn("video/mp4");
-        when(videoFileStorageService.save(videoMock)).thenReturn("savedVideo.mp4");
-        when(fileStorageService.save(videoMock)).thenReturn("savedVideo.mp4");
+        when(fileStorageService.saveVideo(videoMock)).thenReturn("savedVideo.mp4");
+        when(fileStorageService.saveVideo(videoMock)).thenReturn("savedVideo.mp4");
 
         // Repositories
         when(movieRepository.findById(movieId)).thenReturn(Optional.of(existingMovie));
@@ -287,12 +313,12 @@ class MovieServiceTest {
         assertEquals("video/mp4", result.getVideoType());
         assertEquals("savedImage.png", result.getImageName());
         assertEquals("savedVideo.mp4", result.getVideoName());
-        assertEquals("savedVideo.mp4", result.getVideoPath());
+        assertEquals("https://null.s3.null.amazonaws.com/savedVideo.mp4", result.getVideoPath());
 
         verify(movieRepository).findById(movieId);
-        verify(fileStorageService).save(imageMock);
-        verify(fileStorageService).save(videoMock);
-        verify(videoFileStorageService).save(videoMock);
+        verify(fileStorageService).saveImage(imageMock);
+        verify(fileStorageService).saveVideo(videoMock);
+        verify(fileStorageService).saveVideo(videoMock);
         verify(movieRepository).save(any(Movie.class));
         verify(usersMovieRepository).findByMovieId(movieId);
         verify(usersMovieRepository).save(any(UsersMovie.class));

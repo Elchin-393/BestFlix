@@ -13,6 +13,10 @@ login.addEventListener("click", function() {
 })
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  const apiUrl = "http://localhost:8080";
+
+
   const logbtn = document.querySelector(".log-btn");
 
   /**
@@ -77,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Submit registration
     try {
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(`${apiUrl}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

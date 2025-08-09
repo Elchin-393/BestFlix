@@ -1,8 +1,12 @@
+
 /**
  * Forgot Password Script
  * Validates email input and sends reset request to backend.
  */
 document.querySelector(".send-btn").addEventListener("click", async () => {
+
+  const apiUrl = "http://localhost:8080";
+
 
   /** @type {string} */
     const email = document.querySelector(".input-e").value.trim();
@@ -31,7 +35,7 @@ document.querySelector(".send-btn").addEventListener("click", async () => {
 
     try {
       /** @type {Response} */
-      const response = await fetch("http://localhost:8080/forgot-password", {
+      const response = await fetch(`${apiUrl}/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email })

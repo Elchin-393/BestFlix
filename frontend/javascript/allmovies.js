@@ -19,12 +19,17 @@ let searchActive = false;
 
 
   document.addEventListener("DOMContentLoaded", async () => {
+
+    const apiUrl = "http://localhost:8080";
+
+
   try {
     /**
      * Fetches all movies from the backend.
      * @returns {Promise<Object[]>} Array of movie objects
      */
-    const response = await fetch("http://localhost:8080/rest/api/movie/all");
+    
+    const response = await fetch(`${apiUrl}/rest/api/movie/all`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -35,7 +40,7 @@ let searchActive = false;
     const totalPages = Math.ceil(movies.length / itemsPerPage);
 
     const paginationContainer = document.querySelector("#pagination");
-
+  
 
     /**
      * Displays movies for the given page.
@@ -52,7 +57,7 @@ let searchActive = false;
         const movieDiv = document.createElement("div");
         movieDiv.innerHTML = `
           <a href="movies.html?id=${movie.id}">
-            <img class="poster" src="http://localhost:8080/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
+            <img class="poster" src="${apiUrl}/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
             <h5>${movie.movieName}</h5>
             <h5>${new Date(movie.releaseDate).getFullYear()} 
               <span><img src="/images/icons/dot.png" alt=""></span> 

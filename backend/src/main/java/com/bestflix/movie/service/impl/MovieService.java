@@ -11,9 +11,15 @@ import com.bestflix.movie.security.entity.Users;
 import com.bestflix.movie.security.repository.UserRepository;
 import com.bestflix.movie.service.IMovieService;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutBucketAclRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,18 +35,24 @@ import java.util.stream.Collectors;
 public class MovieService implements IMovieService {
 
     private final FileStorageService fileStorageService;
-    private final VideoFileStorageService videoFileStorageService;
     private final MovieRepository movieRepository;
     private final UserRepository userRepository;
     private final UsersMovieRepository usersMovieRepository;
+    private final S3Client s3Client;
 
-    public MovieService(FileStorageService fileStorageService, VideoFileStorageService videoFileStorageService, MovieRepository movieRepository,
-                 UserRepository userRepository, UsersMovieRepository usersMovieRepository){
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
+    @Value("${cloud.aws.bucket.name}")
+    private String bucketName;
+
+    public MovieService(FileStorageService fileStorageService, MovieRepository movieRepository,
+                        UserRepository userRepository, UsersMovieRepository usersMovieRepository, S3Client s3Client){
         this.fileStorageService = fileStorageService;
         this.movieRepository = movieRepository;
         this.userRepository = userRepository;
         this.usersMovieRepository = usersMovieRepository;
-        this.videoFileStorageService = videoFileStorageService;
+        this.s3Client = s3Client;
     }
 
 
@@ -67,10 +79,10 @@ public class MovieService implements IMovieService {
     @Override
     public Movie uploadMovie(String username, Movie movie, MultipartFile image, MultipartFile video) throws IOException {
 
-
+        String imageKey = fileStorageService.saveImage(image);
+        String videoKey = fileStorageService.saveVideo(video);
 
         Movie movieFile = Movie.builder()
-
                 .movieName(movie.getMovieName())
                 .country(movie.getCountry())
                 .releaseDate(movie.getReleaseDate())
@@ -78,26 +90,21 @@ public class MovieService implements IMovieService {
                 .duration(movie.getDuration())
                 .about(movie.getAbout())
                 .category(movie.getCategory())
-                .imageName(fileStorageService.save(image))
+                .imageName(imageKey)
                 .imageType(image.getContentType())
-                .imageData(image.getBytes())
-                .videoName(fileStorageService.save(video))
+                .videoName(videoKey)
                 .videoType(video.getContentType())
-                .videoPath(videoFileStorageService.save(video))
-
+                .videoPath("https://" + bucketName + ".s3." + region + ".amazonaws.com/" + videoKey)
                 .build();
 
         Movie savedMovie = movieRepository.save(movieFile);
 
         Users user = userRepository.findByUsername(username);
-
-        if(user == null)
-            throw new UserNotFoundException(username);
+        if (user == null) throw new UserNotFoundException(username);
 
         UsersMovie myMovie = UsersMovie.builder()
-
                 .user(user)
-                .movie(movieFile)
+                .movie(savedMovie)
                 .build();
 
         usersMovieRepository.save(myMovie);
@@ -181,6 +188,19 @@ public class MovieService implements IMovieService {
      */
     @Override
     public String deleteMovieById(Long id) {
+
+        Movie movie = movieRepository.findById(id).orElseThrow(()-> new MovieNotFoundException());
+
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("images/" + movie.getImageName())
+                .build());
+
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("videos/" + movie.getVideoName())
+                .build());
+
         usersMovieRepository.deleteAllByMovieId(id);
 
         movieRepository.deleteById(id);
@@ -209,6 +229,18 @@ public class MovieService implements IMovieService {
 
         Movie updatedMovie = movieRepository.findById(movieId).orElseThrow(()-> new MovieNotFoundException());
 
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("images/" + updatedMovie.getImageName())
+                .build());
+
+        s3Client.deleteObject(DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key("videos/" + updatedMovie.getVideoName())
+                .build());
+
+        String newImageKey = fileStorageService.saveImage(image);
+        String newVideoKey = fileStorageService.saveVideo(video);
 
         updatedMovie.setMovieName(movie.getMovieName());
         updatedMovie.setCountry(movie.getCountry());
@@ -217,27 +249,24 @@ public class MovieService implements IMovieService {
         updatedMovie.setDuration(movie.getDuration());
         updatedMovie.setAbout(movie.getAbout());
         updatedMovie.setCategory(movie.getCategory());
-        updatedMovie.setImageName(fileStorageService.save(image));
+        updatedMovie.setImageName(newImageKey);
         updatedMovie.setImageType(image.getContentType());
-        updatedMovie.setImageData(image.getBytes());
-        updatedMovie.setVideoName(fileStorageService.save(video));
+        updatedMovie.setVideoName(newVideoKey);
         updatedMovie.setVideoType(video.getContentType());
-        updatedMovie.setVideoPath(videoFileStorageService.save(video));
+        updatedMovie.setVideoPath("https://" + bucketName + ".s3." + region + ".amazonaws.com/" + newVideoKey);
+
 
         movieRepository.save(updatedMovie);
 
-
         UsersMovie usersMovie = usersMovieRepository.findByMovieId(movieId);
-
-        if(usersMovie == null)
+        if (usersMovie == null)
             throw new UserMoviesNotFoundException();
 
         usersMovie.setMovie(updatedMovie);
-
         usersMovieRepository.save(usersMovie);
-
 
         return updatedMovie;
     }
+
 
 }

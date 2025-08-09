@@ -3,6 +3,11 @@
  * Handles password reset using token from URL query parameters.
  */
 document.querySelector(".submit-btn").addEventListener("click", async () => {
+
+
+  const apiUrl = "http://localhost:8080";
+
+
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get("token");
     const newPassword = document.querySelector(".input-n-p").value;
@@ -19,7 +24,7 @@ document.querySelector(".submit-btn").addEventListener("click", async () => {
 
     // Send reset request
     try {
-      const response = await fetch("http://localhost:8080/reset-password", {
+      const response = await fetch(`${apiUrl}/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

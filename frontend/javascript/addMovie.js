@@ -1,9 +1,12 @@
+
 /**
  * Handles upload and update operations for movies.
  * Validates image and video inputs, movie metadata, and updates UI accordingly.
  * Relies on SweetAlert2 and fetch API for communication.
  */
 document.querySelector(".upload-btn").addEventListener("click", async () => {
+  const apiUrl = "http://localhost:8080";
+
 
   /** @type {string} */
   const uploadLabel = document.querySelector(".upload-btn h5")?.textContent;
@@ -90,8 +93,8 @@ if (isUpdate) {
   try {
     /** @type {string} */
     const url = isUpdate
-      ? "http://localhost:8080/rest/api/movie/update"
-      : "http://localhost:8080/rest/api/movie/upload";
+      ? `${apiUrl}/rest/api/movie/update`
+      : `${apiUrl}/rest/api/movie/upload`;
       
 
       /** @type {Response} */
@@ -172,6 +175,9 @@ document.getElementById("video-upload")
  * Loads movie data into form fields for update operation on DOM load.
  */
 document.addEventListener("DOMContentLoaded", async () => {
+
+    const apiUrl = "http://localhost:8080";
+
   const params = new URLSearchParams(window.location.search);
   const movieId = params.get("id");
   if (!movieId) return;
@@ -179,7 +185,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     const token = localStorage.getItem("jwtToken");
 
-    const response = await fetch(`http://localhost:8080/rest/api/movie/${movieId}`, {
+    const response = await fetch(`${apiUrl}/rest/api/movie/${movieId}`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }

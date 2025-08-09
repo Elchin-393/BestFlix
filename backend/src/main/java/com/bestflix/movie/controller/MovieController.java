@@ -11,17 +11,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://127.0.0.1:5500")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("rest/api/movie/")
@@ -29,6 +32,10 @@ import java.util.Optional;
 public class MovieController {
 
     private final IMovieService movieService;
+    private final S3Client s3Client;
+
+    @Value("${cloud.aws.bucket.name}")
+    private String bucketName;
 
 
     /**
@@ -127,12 +134,28 @@ public class MovieController {
             @ApiResponse(responseCode = "404", description = "Image not found")
     })
     @GetMapping("/image/{id}")
-    public ResponseEntity<byte[]> getMovieImage(@PathVariable Long id) {
+    public ResponseEntity<?> getMovieImage(@PathVariable Long id) {
         return movieService.getMovieById(id)
-                .map(movie -> ResponseEntity
-                        .ok()
-                        .header("Content-Type", movie.getImageType())
-                        .body(movie.getImageData()))
+                .map(movie -> {
+                    try {
+                        // Ensure the key includes the folder prefix
+                        String key = "images/" + movie.getImageName(); // e.g., "images/movie123.jpg"
+
+                        byte[] imageBytes = s3Client.getObject(GetObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(key)
+                                .build()).readAllBytes();
+
+                        return ResponseEntity.ok()
+                                .header("Content-Type", movie.getImageType())
+                                .body(imageBytes);
+
+                    } catch (IOException e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    } catch (S3Exception e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                    }
+                })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -154,18 +177,25 @@ public class MovieController {
     public ResponseEntity<?> getVideo(@PathVariable Long id) {
         return movieService.getMovieById(id)
                 .map(movie -> {
-                    FileSystemResource resource = new FileSystemResource(movie.getVideoPath());
-                    MediaType mediaType = MediaTypeFactory.getMediaType(resource)
-                            .orElse(MediaType.APPLICATION_OCTET_STREAM);
-
                     try {
+                        // Ensure the key includes the folder prefix
+                        String key = "videos/" + movie.getVideoName(); // e.g., "videos/movie123.mp4"
+
+                        byte[] videoBytes = s3Client.getObject(GetObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(key)
+                                .build()).readAllBytes();
+
                         return ResponseEntity.ok()
-                                .contentType(mediaType)
-                                .contentLength(resource.contentLength())
-                                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + resource.getFilename())
-                                .body(resource);
+                                .contentType(MediaType.valueOf(movie.getVideoType())) // e.g., "video/mp4"
+                                .contentLength(videoBytes.length)
+                                .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + movie.getVideoName())
+                                .body(videoBytes);
+
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    } catch (S3Exception e) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                     }
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

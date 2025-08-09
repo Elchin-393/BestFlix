@@ -1,8 +1,12 @@
+
 /**
  * Movie Page Loader
  * Fetches movie details from server and renders the movie view including a video player.
  */
 document.addEventListener("DOMContentLoaded", async () => {
+
+  const apiUrl = "http://localhost:8080";
+
 
   /** @type {HTMLElement} */
   const moviePage = document.getElementById("movie");
@@ -18,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  try {
 
   /** @type {Response} */
-  const response = await fetch(`http://localhost:8080/rest/api/movie/${movieId}`);
+  const response = await fetch(`${apiUrl}/rest/api/movie/${movieId}`);
 
   if(!response.ok){
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -32,7 +36,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const moviePageDiv = document.createElement("div");
       moviePageDiv.innerHTML = `
       
-      <div class="picture"> <img src="http://localhost:8080/rest/api/movie/image/${movieId}"></div>
+      <div class="picture"> <img src="${apiUrl}/rest/api/movie/image/${movieId}"></div>
       <button class="watch-btn">Watch now</button>
       <div><h2>${movie.movieName}</h2></div>
       <div id="info">
@@ -63,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const videoDiv = document.createElement("div");
         videoDiv.innerHTML = `
           <video class="video" width="900" controls>
-            <source src="http://localhost:8080/rest/api/movie/video/${movieId}" type="video/mp4">
+            <source src="${apiUrl}/rest/api/movie/video/${movieId}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         `;

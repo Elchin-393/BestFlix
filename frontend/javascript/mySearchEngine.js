@@ -1,9 +1,13 @@
+
 /**
  * My Search Engine
  * Implements live search, autocomplete, pagination, and history syncing
  * for a user's personal movie collection.
  */
 document.addEventListener("DOMContentLoaded", async () => {
+
+  const apiUrl = "http://localhost:8080";
+  
   const token = localStorage.getItem("jwtToken");
 
   /** @type {{ username?: string, sub?: string }} */
@@ -22,7 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pageParam = parseInt(urlParams.get("page")) || 1;
     currentPage = pageParam;
 
-    const response = await fetch("http://localhost:8080/rest/api/movie/mymovies", {
+    const response = await fetch(`${apiUrl}/rest/api/movie/mymovies`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username })
@@ -73,7 +77,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         movieDiv.dataset.id = movie.id;
         movieDiv.innerHTML = `
           <a href="movies.html?id=${movie.id}">
-            <img class="poster" src="http://localhost:8080/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
+            <img class="poster" src="${apiUrl}/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
             <h5>${movie.movieName}</h5>
             <h5>${new Date(movie.releaseDate).getFullYear()} <span><img src="/images/icons/dot.png" alt=""></span> ${movie.duration}</h5>
           </a>
@@ -182,7 +186,7 @@ document.querySelector("#nextPage").onclick = () => {
         const item = document.createElement("div");
         item.className = "autocomplete-item";
         item.innerHTML = `
-          <img class="search-image" src="http://localhost:8080/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
+          <img class="search-image" src="${apiUrl}/rest/api/movie/image/${movie.id}" alt="${movie.movieName}">
           <div id="movie-info">
             <div><span class="movie-name">${movie.movieName}</span></div>
             <div class="bottom-info">

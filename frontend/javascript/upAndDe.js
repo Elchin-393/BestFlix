@@ -3,6 +3,10 @@
  * Handles deletion and redirection for movie update via dataset ID.
  */
 document.addEventListener("DOMContentLoaded", async () => {
+
+  const apiUrl = "http://localhost:8080";
+
+  
   const token = localStorage.getItem("jwtToken");
 
 
@@ -30,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
     try {
-      const response = await fetch(`http://localhost:8080/rest/api/movie/delete/${movieId}`, {
+      const response = await fetch(`${apiUrl}/rest/api/movie/delete/${movieId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

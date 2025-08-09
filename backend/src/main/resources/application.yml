@@ -3,9 +3,9 @@ spring:
     name: movie
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=movie
-    username: postgres
-    password: 1
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -19,8 +19,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: mamedovelchin6@gmail.com
-    password: kiwarefhcishoxqu
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -34,15 +34,25 @@ spring:
     multipart:
       max-file-size: 1GB
       max-request-size: 1GB
-
-  h2:
-    console:
-      path: /h2-console
       enabled: true
 
+
+
+frontend:
+  url: ${FRONTEND_URL}
+
 jwt:
-  secret: yoBLl6KR5te3Pow3qsFG5T19TZFzPV2w/8s+2xhbfKACQT1hv+YdxV9l4QMdxExsa2hm0VBb17MEfW0QOVHttA==
+  secret: ${JWT_SECRET_KEY}
 
 
+cloud:
+  aws:
+    region:
+      static: ${AWS_REGION}
+    bucket:
+      name: ${AWS_BUCKET_NAME}
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
 
 

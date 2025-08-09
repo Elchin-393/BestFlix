@@ -2,6 +2,7 @@ package com.bestflix.movie.controller;
 
 import com.bestflix.movie.entity.Movie;
 import com.bestflix.movie.service.IMovieService;
+import com.bestflix.movie.service.impl.S3Config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,17 +12,27 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,12 +47,17 @@ class MovieControllerTest {
     @Mock
     private IMovieService movieService;
 
+    @Mock
+    private S3Client s3Client;
+
     @InjectMocks
     private MovieController movieController;
 
+    private final String bucketName = "test-bucket";
+
     @BeforeEach
     void setup() {
-        movieController = new MovieController(movieService);
+        movieController = new MovieController(movieService,s3Client);
         mockMvc = MockMvcBuilders.standaloneSetup(movieController).build();
     }
 
@@ -132,22 +148,35 @@ class MovieControllerTest {
     }
 
     @Test
-    void shouldReturnImageDataWithProperHeaders() throws Exception {
+    void shouldReturnImageBytesWhenMovieExists() throws Exception {
+        // Arrange
         Long movieId = 1L;
-        byte[] imageData = "fake image".getBytes();
-        String imageType = MediaType.IMAGE_JPEG_VALUE;
+        String imageKey = "movie123.jpg";
+        String imageType = "image/jpeg";
+        byte[] imageBytes = "fake-image-content".getBytes();
 
-        Movie movie = new Movie();
-        movie.setImageData(imageData);
-        movie.setImageType(imageType);
+        Movie movie = Movie.builder()
+                .id(movieId)
+                .imageName(imageKey)
+                .imageType(imageType)
+                .build();
 
         when(movieService.getMovieById(movieId)).thenReturn(Optional.of(movie));
 
+
+        ResponseInputStream<GetObjectResponse> mockStream = new ResponseInputStream<>(
+                GetObjectResponse.builder().build(),
+                new ByteArrayInputStream(imageBytes)
+        );
+
+        when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(mockStream);
+        // Act & Assert
         mockMvc.perform(get("/rest/api/movie/image/{id}", movieId))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", imageType))
-                .andExpect(content().bytes(imageData));
+                .andExpect(content().bytes(imageBytes));
     }
+
 
     @Test
     void shouldReturnNotFoundWhenMovieMissing() throws Exception {
@@ -161,24 +190,36 @@ class MovieControllerTest {
 
 
     @Test
-    void shouldReturnVideoStreamWithHeaders() throws Exception {
+    void shouldReturnVideoBytesWhenMovieExists() throws IOException {
+        // Arrange
         Long movieId = 1L;
-        String videoPath = "src/test/resources/test-video.mp4";
-        File file = new File(videoPath);
-        byte[] videoContent = Files.readAllBytes(file.toPath());
+        String videoName = "movie123.mp4";
+        String videoType = "video/mp4";
+        byte[] videoBytes = "fake video content".getBytes();
 
         Movie movie = new Movie();
-        movie.setVideoPath(videoPath);
+        movie.setId(movieId);
+        movie.setVideoName(videoName);
+        movie.setVideoType(videoType);
 
         when(movieService.getMovieById(movieId)).thenReturn(Optional.of(movie));
 
-        mockMvc.perform(get("/rest/api/movie/video/{id}", movieId))
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName()))
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.valueOf("video/mp4").toString()))
-                .andExpect(header().longValue(HttpHeaders.CONTENT_LENGTH, videoContent.length))
-                .andExpect(content().bytes(videoContent));
+        ResponseInputStream<GetObjectResponse> mockStream = mock(ResponseInputStream.class);
+        when(mockStream.readAllBytes()).thenReturn(videoBytes);
+
+        when(s3Client.getObject(any(GetObjectRequest.class))).thenReturn(mockStream);
+
+        ResponseEntity<?> response = movieController.getVideo(movieId);
+
+        // Then
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(MediaType.valueOf(videoType), response.getHeaders().getContentType());
+        assertEquals(videoBytes.length, response.getHeaders().getContentLength());
+        assertEquals("inline;filename=" + videoName, response.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION));
+        assertArrayEquals(videoBytes, (byte[]) response.getBody());
     }
+
+
     @Test
     void shouldReturnNotFoundForMissingMovie() throws Exception {
         Long missingId = 404L;

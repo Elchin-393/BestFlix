@@ -1,3 +1,4 @@
+
 /**
  * Handles click event on the "Register" link.
  * Navigates the user to the registration page.
@@ -21,6 +22,9 @@ forgotPassword.addEventListener("click", () => {
  * Initializes login functionality after DOM content is loaded.
  */
 document.addEventListener("DOMContentLoaded", async() =>{
+
+  const apiUrl = "http://localhost:8080";
+
 
   const loginBtn = document.querySelector(".log-btn");
 
@@ -77,7 +81,7 @@ document.addEventListener("DOMContentLoaded", async() =>{
   * Sends login request to backend.
   * @returns {Response} response containing JWT or error details
   */
-  const response = await fetch("http://localhost:8080/login", {
+  const response = await fetch(`${apiUrl}/login`, {
     method: "POST",
     headers: {"Content-Type" : "application/json"},
     body: JSON.stringify(data)
