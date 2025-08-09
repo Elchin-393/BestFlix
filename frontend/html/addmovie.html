@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BestFlix</title>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" />
+    <link rel="stylesheet" href="/css/allmovies.css">
+    <link rel="stylesheet" href="/css/addmovie.css">
+
+
+  </head>
+  <body>
+    
+    
+    <section id="mainpage">
+      
+      <div id="header">
+
+      <div>
+        <a href="index.html" class="logo"><img src="/images/icons/logo.png" alt=""></a>
+      </div>
+
+      <div>
+        <ul id="tabs">
+          <li><a href="allmovies.html">All Movies</a></li>
+          <li><a href="topmovies.html">Top Movies</a></li>
+          <li><a href="tvshows.html">TV Shows</a></li>
+        </ul>
+      </div>
+
+      <div id="search">
+          <input type="text" placeholder="Find movies & TV shows" class="search">
+          <button  class="search-button"><img src="/images/icons/search.png" alt=""></button>
+        </div>
+      
+      <div id="sign">
+         <button class="sign-in" onclick="window.location.href = 'login.html'"><h4>Sign in</h4></button>
+      </div>
+
+      <div class="autocomplete-results"></div>
+
+      </div>
+
+    </section>
+
+    
+    
+    
+    <section id="add-movie-info">
+
+
+      <div>
+        <h1>Add Your Own Movie</h1>
+      </div>
+      
+      <div id="infos">
+
+        <div id="info-1">
+          <div class="input">
+            <h6>Name</h6>
+            <input id="movieName" class="input-name" type="text" placeholder="Movie Name">
+          </div>
+          <div class="input">
+            <h6>Country</h6>
+            <input id="country" class="input-country" type="text" placeholder="Country">
+          </div>
+          <div class="input">
+            <h6>Release Date</h6>
+            <input id="releaseDate" class="input-date" type="date" placeholder="YY/MM/DD">
+          </div>
+          <div class="input">
+            <h6>Casts</h6>
+            <input id="casts" class="input-casts" type="text" placeholder="Actors & Actresses">
+          </div>
+        </div>
+
+        <div id="info-2">
+          <div class="input" class="input-m">
+            <h6>Upload Movie</h6>
+            <input class="input-movie" type="text" placeholder="Add Movie" readonly>
+            <input id="video-upload" type="file" accept="video/*" style="display: none;">          
+          </div>
+          <div class="input" class="input-m">
+              <select id="selection">
+                <option value="movie">Movie</option>
+                <option value="TV Show">TV Show</option>
+              </select>
+          </div>
+            <div class="input" class="input-p">
+            <h6>Upload Picture</h6>
+            <input class="input-picture" type="text" placeholder="Add Picture" readonly>
+            <input id="picture-upload" type="file" accept="image/*" style="display: none;">          
+          </div>
+          <div class="duration-cnt">
+            <h6>Duration</h6>
+            <input id="duration" class="input-duration" type="text" placeholder="100 min">
+          </div>
+          <div class="input">
+            <h6>About</h6>
+            <textarea id="about" class="input-about" placeholder="Describe the movie"></textarea>
+          </div>
+        </div>
+        
+      </div>
+
+      <div>
+        <button class="upload-btn"><h5>Upload</h5></button>
+      </div>
+
+      <div id="input-m">
+        <input id="video-upload" type="file" accept="video/*" style="display: none;" />
+        <label for="video-upload" class="add-movie-btn"><h5>Add</h5></label>
+      </div>
+
+      <div id="input-p">
+        <input id="picture-upload" type="file" accept="image/*" style="display: none;" />
+        <label for="picture-upload" class="add-picture-btn"><h5>Add</h5></label>
+      </div>
+
+    </section>
+
+    
+    
+    <script src="/javascript/addMovie.js"></script>
+    <script src="/javascript/customSearchEngine.js"></script>
+    <script src="/javascript/upAndDe.js"></script>
+    <script src="/javascript/authGuard.js"></script>
+    <script src="/javascript/authCheck.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+  </body>
+</html>
