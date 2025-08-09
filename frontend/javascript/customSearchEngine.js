@@ -35,9 +35,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const term = searchInput.value.trim();
         const path = window.location.pathname.includes("tvshows.html");
         if(path) {
-              window.location.href = `/html/resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
           }else{
-              window.location.href = `/html/resultPage.html?query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?query=${encodeURIComponent(term)}`;
             }
             
         });
@@ -52,10 +52,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           const path = window.location.pathname.includes("tvshows.html");
           if (term !== "") {
             if(path) {
-              window.location.href = `/html/resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
             }
             else{
-              window.location.href = `/html/resultPage.html?query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?query=${encodeURIComponent(term)}`;
             }
             
             }
@@ -118,9 +118,9 @@ let matches = baseSet.filter(movie =>
           const term = searchInput.value.trim();
         const path = window.location.pathname.includes("tvshows.html");
         if(path) {
-              window.location.href = `/html/resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
           }else{
-              window.location.href = `/html/resultPage.html?query=${encodeURIComponent(term)}`;
+              window.location.href = `resultPage.html?query=${encodeURIComponent(term)}`;
             }
         });
 
@@ -162,7 +162,7 @@ let matches = baseSet.filter(movie =>
        * @param {number} page
        */
         function updateUrlPage(page) {
-          const newUrl = `/html/resultPage.html?query=${encodeURIComponent(query)}&page=${page}`;
+          const newUrl = `resultPage.html?query=${encodeURIComponent(query)}&page=${page}`;
           history.pushState({ page }, "", newUrl);
         }
 
