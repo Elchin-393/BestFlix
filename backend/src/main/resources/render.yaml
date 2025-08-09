@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: bestflix-backend
+    env: java
+    rootDir: backend
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_HOME
+        value: /opt/render/project/java
