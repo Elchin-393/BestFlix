@@ -88,7 +88,7 @@ public class UserService {
     public String generateResetToken(String email) {
         Optional<Users> user = userRepository.findByEmail(email);
         if (user.isEmpty() || user == null)
-            throw new UserNotFoundException("User with email" + email);
+            throw new UserNotFoundException("User with email: " + email);
 
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken();
