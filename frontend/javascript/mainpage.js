@@ -2,7 +2,16 @@
  * Main Page Script
  * Handles redirect on sign-in click and search bar animation.
  */
+ const sign = document.querySelector("#sign .sign-in");
 
+ /**
+ * Redirects user to login page when sign-in button is clicked.
+ */
+ sign.addEventListener("click", function() {
+
+  window.location.href = "/html/login.html";
+  
+  })
 
   // Search input behavior
   document.addEventListener("DOMContentLoaded", () => {
