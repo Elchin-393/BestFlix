@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (isValidToken) {
     signInText.textContent = "Home";
-    signInBtn.onclick = () => window.location.href = "mymovies.html"; 
+    signInBtn.onclick = () => window.location.href = "/html/mymovies.html"; 
     signInBtn.classList.add("logged-in"); 
   } else {
     signInText.textContent = "Sign in";
@@ -35,4 +35,5 @@ document.addEventListener("DOMContentLoaded", () => {
     signInBtn.classList.remove("logged-in");
   }
 });
+
 
