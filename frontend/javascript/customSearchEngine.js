@@ -120,7 +120,7 @@ let matches = baseSet.filter(movie =>
         if(path) {
               window.location.href = `resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
           }else{
-              window.location.href = `resultPage.html?query=${encodeURIComponent(term)}`;
+              window.location.href = `/html/resultPage.html?query=${encodeURIComponent(term)}`;
             }
         });
 
@@ -287,6 +287,7 @@ let matches = baseSet.filter(movie =>
     
  
 });
+
 
 
 
