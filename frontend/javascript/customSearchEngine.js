@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if(path) {
               window.location.href = `resultPage.html?category=tvshows&query=${encodeURIComponent(term)}`;
           }else{
-              window.location.href = `resultPage.html?query=${encodeURIComponent(term)}`;
+              window.location.href = `/html/resultPage.html?query=${encodeURIComponent(term)}`;
             }
             
         });
@@ -105,7 +105,7 @@ let matches = baseSet.filter(movie =>
             </div>
           `;
           item.addEventListener("click", () => {
-            window.location.href = `movies.html?id=${movie.id}`;
+            window.location.href = `/html/movies.html?id=${movie.id}`;
           });
           autocompleteBox.appendChild(item);
         });
@@ -287,6 +287,7 @@ let matches = baseSet.filter(movie =>
     
  
 });
+
 
 
 
