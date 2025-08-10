@@ -31,7 +31,8 @@ document.addEventListener("DOMContentLoaded", () => {
     signInBtn.classList.add("logged-in"); 
   } else {
     signInText.textContent = "Sign in";
-    signInBtn.onclick = () => window.location.href = "login.html";
+    signInBtn.onclick = () => window.location.href = "/html/login.html";
     signInBtn.classList.remove("logged-in");
   }
 });
+
