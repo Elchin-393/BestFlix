@@ -27,7 +27,7 @@ public class EmailService {
     public void sendPasswordResetEmail(String toEmail, String token) {
 
         try{
-        String resetLink = "http://127.0.0.1:5500/html/reset-password.html?token=" + token;
+        String resetLink = "https://best-flix.netlify.app/html/reset-password.html?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
