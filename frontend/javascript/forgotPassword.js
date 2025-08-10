@@ -32,6 +32,7 @@ document.querySelector(".send-btn").addEventListener("click", async () => {
     });
     return;
   }
+  console.log(email);
 
     try {
       /** @type {Response} */
@@ -64,4 +65,5 @@ document.querySelector(".send-btn").addEventListener("click", async () => {
         icon: "error"
       });
     }
+
   });
