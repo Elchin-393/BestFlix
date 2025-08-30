@@ -2,6 +2,8 @@
 
 BestFlix is a full-stack movie web application built with Java and Spring Boot. It allows users to log in, manage their personal movie list, and perform full CRUD operations. The project focuses on clean backend architecture and functional frontend integration.
 
+<img width="1365" height="682" alt="Image" src="https://github.com/user-attachments/assets/77a63734-e2bb-4f2f-a8ca-44479fb0ed3e" />
+
 ---
 
 ## 🔧 Main Features
