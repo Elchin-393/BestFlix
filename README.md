@@ -17,17 +17,21 @@ BestFlix is a full-stack movie web application built with Java and Spring Boot. 
 ## 🛠️ Tech Stack
 
 **Backend**  
+- 🔐 Java
+- 🔑 Spring
+- 📄 Spring Security
 - 🔐 Security configuration
 - 🔑 Custom login system
 - 📄 API documentation with Swagger
 - 🧪 JWT-based authentication filter
 - 📧 Email service integration
+- 🐳 Dockerized backend
 - ✅ Comprehensive test coverage
 
 
 **Frontend**  
-- HTML, CSS, JavaScript  
-- Vanilla JS for dynamic DOM updates  
+- HTML, CSS, JavaScript (Vanilla JS) 
+- SweetAlert2 for interactive modals and alerts  
 
 **Deployment**  
 - 🌐 Backend: Render
